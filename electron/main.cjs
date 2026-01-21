@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
@@ -107,21 +107,25 @@ function startBackend() {
 }
 
 function createWindow() {
+  const config = loadAppConfig();
+  const devtoolsEnabled =
+    process.env.ENABLE_DEVTOOLS === '1' || config.devtoolsEnabled === true;
+
   const win = new BrowserWindow({
     width: 1280,
     height: 800,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
+      devTools: devtoolsEnabled,
     },
   });
 
+  win.setMenuBarVisibility(false);
+  win.setAutoHideMenuBar(true);
+
   // Show a loading screen while waiting for the backend
   win.loadFile(path.join(__dirname, 'loading.html'));
-
-  const config = loadAppConfig();
-  const devtoolsEnabled =
-    process.env.ENABLE_DEVTOOLS === '1' || config.devtoolsEnabled === true;
 
   if (devtoolsEnabled) {
     win.webContents.openDevTools({ mode: 'detach' });
@@ -134,6 +138,8 @@ app.whenReady().then(() => {
   startBackend();
   const win = createWindow();
 
+  Menu.setApplicationMenu(null);
+
   waitForBackend().then((ready) => {
     if (!ready) {
       console.warn('Backend did not become ready before timeout.');
@@ -142,12 +148,6 @@ app.whenReady().then(() => {
     win.loadFile(path.join(__dirname, '../frontend/dist/index.html'));
   });
 
-  globalShortcut.register('CommandOrControl+Alt+I', () => {
-    const focusedWindow = BrowserWindow.getFocusedWindow();
-    if (focusedWindow) {
-      focusedWindow.webContents.toggleDevTools();
-    }
-  });
 });
 
 app.on('window-all-closed', () => {
@@ -157,7 +157,6 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', () => {
-  globalShortcut.unregisterAll();
   if (backendProcess) {
     backendProcess.kill();
   }
