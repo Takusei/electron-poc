@@ -8,8 +8,9 @@
     "build": "cd frontend && npx vite build",
     "build:backend": "cd backend && uv run python -m PyInstaller -y --clean --name backend --onefile app/entrypoint.py",
     "dev": "cd frontend && npx vite",
-    "electron": "cd frontend && npx vite build && cd .. && electron .",
-    "dist": "cd frontend && npx vite build && cd .. && npm run build:backend && electron-builder"
+    "start": "electron-forge start",
+    "package": "npm run build && npm run build:backend && electron-forge package",
+    "make": "npm run build && npm run build:backend && electron-forge make"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -70,8 +71,13 @@
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",
     "@vitejs/plugin-react": "4.7.0",
+    "@electron-forge/cli": "^7.9.0",
+    "@electron-forge/maker-deb": "^7.9.0",
+    "@electron-forge/maker-dmg": "^7.9.0",
+    "@electron-forge/maker-rpm": "^7.9.0",
+    "@electron-forge/maker-squirrel": "^7.9.0",
+    "@electron-forge/maker-zip": "^7.9.0",
     "electron": "^40.0.0",
-    "electron-builder": "^26.4.0",
     "tailwindcss": "4.1.12",
     "vite": "6.3.5"
   },
@@ -92,35 +98,7 @@
       "vite": "6.3.5"
     }
   },
-  "build": {
-    "appId": "com.figma.mymakefile",
-    "productName": "AI-VDR",
-    "files": [
-      "frontend/dist/**/*",
-      "electron/**/*"
-    ],
-    "extraResources": [
-      {
-        "from": "backend",
-        "to": "backend",
-        "filter": [
-          "app/**",
-          "dist/**",
-          ".env"
-        ]
-      }
-    ],
-    "directories": {
-      "output": "release"
-    },
-    "mac": {
-      "target": "dmg"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "linux": {
-      "target": "AppImage"
-    }
+  "config": {
+    "forge": "./forge.config.cjs"
   }
 }

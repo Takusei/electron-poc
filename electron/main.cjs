@@ -2,6 +2,11 @@ const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
+// const squirrelStartup = require('electron-squirrel-startup');
+
+// if (squirrelStartup) {
+//   app.quit();
+// }
 
 let backendProcess;
 
