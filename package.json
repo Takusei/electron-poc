@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "cd frontend && npx vite build",
-    "build:backend": "cd backend && uv run python -m PyInstaller -y --clean --name backend --onefile app/entrypoint.py",
+    "build:backend": "cd backend && uv run python -m PyInstaller -y --clean --name backend --collect-all chromadb --hidden-import=tiktoken_ext.openai_public --hidden-import=tiktoken_ext --onefile app/entrypoint.py",
     "dev": "cd frontend && npx vite",
     "start": "electron-forge start",
     "package": "npm run build && npm run build:backend && electron-forge package",
